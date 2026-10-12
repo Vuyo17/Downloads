@@ -2420,6 +2420,216 @@ a.card-link.person {
   }
 }
 
+/* tech stack: brand logos from Simple Icons, coloured per theme ------------ */
+.stack {
+  display: grid;
+  gap: 14px;
+  margin-top: 1.6rem;
+}
+
+.stack-band {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 18px 26px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.stack-band-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.stack-band-head h3 {
+  margin: 0 0 4px;
+  font-size: 1.12rem;
+}
+
+.stack-band-head p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.tech-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.tech-grid li + li,
+.tech-strip li + li {
+  margin-top: 0;
+}
+
+.tech {
+  --logo: var(--logo-l);
+  --tint: var(--tint-l);
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tech:hover {
+  transform: translateY(-2px);
+  border-color: var(--logo);
+  box-shadow: var(--shadow-2);
+}
+
+.tech-logo {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--tint);
+}
+
+.tech-logo svg {
+  width: 27px;
+  height: 27px;
+  fill: var(--logo);
+}
+
+.tech-logo--stroke svg {
+  fill: none;
+  stroke: var(--logo);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tech-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.tech-name {
+  font-weight: 700;
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.tech-ver {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  vertical-align: 2px;
+}
+
+.tech-role {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.stack-credit {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.built-with {
+  margin-top: clamp(32px, 4vw, 48px);
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+
+.built-with-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-bottom: 16px;
+}
+
+.built-with-head h3 {
+  margin: 0;
+}
+
+.tech-strip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tech--chip {
+  align-items: center;
+  gap: 10px;
+  padding: 6px 15px 6px 6px;
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.tech--chip .tech-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.tech--chip .tech-logo svg {
+  width: 20px;
+  height: 20px;
+}
+
+.tech--chip .tech-name {
+  font-size: 0.92rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tech {
+    --logo: var(--logo-d);
+    --tint: var(--tint-d);
+  }
+}
+
+:root[data-theme="dark"] .tech {
+  --logo: var(--logo-d);
+  --tint: var(--tint-d);
+}
+
+@media (max-width: 959px) {
+  .stack-band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 479px) {
+  .stack-band {
+    padding: 16px;
+  }
+  .tech-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* 8 · Figures & media -------------------------------------------------------- */
 .figure {
   margin: 0 0 1.4em;

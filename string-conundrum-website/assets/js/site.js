@@ -328,10 +328,20 @@
     return k + (s[(v - 20) % 10] || s[v] || s[0]);
   }
 
+  // How the poster's robot names a character: "the comma", "the 'W'".
+  var CHAR_NAMES = {
+    ",": "the comma", " ": "the space", "!": "the exclamation mark", ".": "the full stop",
+    "?": "the question mark", ":": "the colon", ";": "the semicolon", "'": "the apostrophe",
+    "\"": "the quotation mark", "-": "the hyphen", "_": "the underscore"
+  };
+  function charName(ch) {
+    return CHAR_NAMES[ch] || "the '" + ch + "'";
+  }
+
   function explain(str, expr) {
     var n = str.length;
     var p = PyStr.parse(expr);
-    var res = { cells: [], marks: [], error: null, value: null, text: "", tag: null };
+    var res = { cells: [], marks: [], error: null, value: null, text: "", tag: null, buddy: null };
 
     if (p.kind === "syntax") {
       res.error = "SyntaxError";
@@ -352,6 +362,7 @@
         (pos > 0 ? "word[:" + pos + "] + " : "") + PyStr.repr(raw) + (pos + 1 < n ? " + word[" + (pos + 1) + ":]" : "") + "." : "";
       res.text = "Strings are immutable: Python refuses to change a character in place and the string stays " + PyStr.repr(str) + "." + fixed;
       res.tag = "immutability_in_place";
+      res.buddy = ["Hands off!", " Strings are immutable, so a character can't be swapped in place."];
       return res;
     }
 
@@ -361,6 +372,8 @@
         res.cells.push({ i: j, cls: "is-on", order: null });
         res.marks.push({ pos: j, label: "index " + p.i, note: p.i < 0 ? "= " + j : "" });
         res.value = PyStr.repr(str.charAt(j));
+        res.buddy = ["Hi! I'm " + charName(str.charAt(j)) + " at index " + j + ".",
+          p.i < 0 ? " You found me by counting back from the end." : " Python starts counting at 0."];
         if (p.i < 0) {
           res.text = "Negative indices count back from the end: " + p.i + " + len(word) = " + p.i + " + " + n + " = " + j + ".";
           res.tag = "negative_index_confusion";
@@ -378,6 +391,8 @@
           (p.i === n ? "Index " + n + " is one past the end." : "Index " + p.i + " is outside that range.") +
           " Unlike slicing, indexing never clamps.";
         res.tag = p.i === n ? "off_by_one_length" : "slice_clamping";
+        res.buddy = ["Nobody lives at index " + p.i + ".",
+          n ? " The last character is at index " + (n - 1) + "." : " This string is empty."];
       }
       return res;
     }
@@ -391,6 +406,7 @@
       res.value = err.type + ": " + err.message;
       res.text = "A step of 0 would never move, so Python rejects it.";
       res.tag = "slice_step";
+      res.buddy = ["A step of 0 never moves,", " so Python refuses to run it."];
       return res;
     }
     var k = r.step, parts = [];
@@ -445,6 +461,11 @@
     else if ((p.start !== null && p.start < 0) || (p.stop !== null && p.stop < 0)) { res.tag = "negative_index_confusion"; }
     else if (p.start === null || p.stop === null) { res.tag = "slice_defaults"; }
     else { res.tag = "slice_stop_inclusive"; }
+
+    if (!r.indices.length) { res.buddy = ["Nothing to pick up here.", " An empty slice is a valid answer."]; }
+    else if (r.stop >= 0 && r.stop < n) { res.buddy = ["Hi! I'm " + charName(str.charAt(r.stop)) + " at index " + r.stop + ".", " Stop is excluded, so am I!"]; }
+    else if (k > 0) { res.buddy = ["Stop is past the last index,", " so the slice runs to the end."]; }
+    else { res.buddy = ["Walking backwards", " all the way to the first character!"]; }
     return res;
   }
 
@@ -454,6 +475,7 @@
     var inStr = $("#viz-str", box), inExpr = $("#viz-expr", box);
     var grid = $(".viz-grid", box), marks = null;
     var outVal = $(".viz-result .val", box), outText = $(".viz-explain", box), outMc = $(".viz-mc", box);
+    var bud = $(".viz-buddy", box), bubble = $(".viz-bubble", box);
     var catalogue = box.getAttribute("data-catalogue") || "background.html";
     var presets = $$(".viz-presets .chip", box);
     var timer = null;
@@ -521,6 +543,14 @@
         a.href = catalogue + "#mc-" + res.tag;
         outMc.appendChild(a);
         outMc.appendChild(doc.createTextNode(": \u201C" + CATALOGUE[res.tag][1] + "\u201D."));
+      }
+      if (bud && bubble) {
+        bubble.textContent = "";
+        if (res.buddy) {
+          bubble.appendChild(el("b", null, res.buddy[0]));
+          bubble.appendChild(doc.createTextNode(res.buddy[1]));
+        }
+        bud.hidden = !res.buddy;
       }
       presets.forEach(function (b) {
         b.setAttribute("aria-pressed", b.getAttribute("data-expr") === expr.trim() ? "true" : "false");
@@ -635,7 +665,8 @@
     var input = $("textarea", box), out = $(".xh-out code", box);
     var labIn = $(".xh-in-label", box), labOut = $(".xh-out-label", box);
     var buttons = $$(".seg button", box);
-    var dir = "to-xh";
+    var pressed = buttons.filter(function (b) { return b.getAttribute("aria-pressed") === "true"; })[0] || buttons[0];
+    var dir = pressed.getAttribute("data-dir");
     function render() {
       var src = input.value;
       if (dir === "to-xh") { highlight(out, Xh.toXhosa(src), "xh"); }
